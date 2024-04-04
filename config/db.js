@@ -1,5 +1,5 @@
 const { Sequelize } = require("sequelize");
-const gsmModel = require("../models/gsm.model");
+const Card = require("../models/clocking.model");
 require("dotenv").config();
 
 const sequelize = new Sequelize(
@@ -25,7 +25,7 @@ const sequelize = new Sequelize(
 
 const db = {};
 
-db.HewaTell = gsmModel(sequelize);
+db.CDEDClocking = Card;
 
 db.sequelize = sequelize;
 

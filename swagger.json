@@ -1,66 +1,105 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "HewaTell API",
-    "description": "API Documentation for HewaTell",
+    "title": "CDED Clocking Device API",
+    "description": "API Documentation for CDED'S Clocking Device",
     "version": "1.0.0"
   },
   "paths": {
-    "/": {
+    "/api/clocking/{uuid}/toggle-clock": {
       "get": {
-        "summary": "Root endpoint for testing database connection",
-        "description": "Welcome message",
-        "responses": {
-          "200": {
-            "description": "Successful response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/gsm": {
-      "get": {
-        "summary": "View all registered devices",
-        "description": "Endpoint to GET all registered devices",
-        "responses": {
-          "200": {
-            "description": "Successful response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/gsm/{id}": {
-      "get": {
-        "summary": "View the details of a particular registered device",
-        "description": "This endpoint allows users to view details of a specific registered device identified by its unique ID.",
+        "summary": "Toggle clocked-in status of a card",
+        "description": "Endpoint to toggle the clocked-in status of a card identified by its unique Card_UUID.",
         "parameters": [
           {
-            "name": "id",
+            "name": "uuid",
             "in": "path",
-            "description": "The unique identifier of the registered device to view.",
+            "description": "The unique identifier of the card to toggle the clocked-in status.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "isClockedIn": {
+                      "type": "boolean",
+                      "description": "The updated clocked-in status of the card."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clocking": {
+      "get": {
+        "summary": "View all registered cards",
+        "description": "Endpoint to retrieve details of all registered cards.",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Card"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clocking/{Card_UUID}": {
+      "get": {
+        "summary": "View details of a registered card",
+        "description": "Endpoint to retrieve details of a specific registered card identified by its unique Card_UUID.",
+        "parameters": [
+          {
+            "name": "Card_UUID",
+            "in": "path",
+            "description": "The unique identifier of the registered card to retrieve.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Card"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clocking/delete/{Card_UUID}": {
+      "delete": {
+        "summary": "Delete a registered card",
+        "description": "Endpoint to delete details of a specific registered card identified by its unique Card_UUID.",
+        "parameters": [
+          {
+            "name": "Card_UUID",
+            "in": "path",
+            "description": "The unique identifier of the registered card to delete.",
             "required": true,
             "schema": {
               "type": "string"
@@ -87,130 +126,27 @@
         }
       }
     },
-    "/api/gsm/delete/{id}": {
-      "delete": {
-        "summary": "Delete the details of a particular registered devices",
-        "description": "This endpoint allows users to delete the details of a specific registered device identified by its unique ID.",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "The unique identifier of the registered device to delete.",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "Description": "A message indicating the status of the operation."
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/gsm/registration": {
+    "/api/clocking/register": {
       "post": {
-        "summary": "Register a new device",
-        "description": "Endpoint to register a new device",
+        "summary": "Register a new card",
+        "description": "Endpoint to register a new card.",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "DeviceCode": {
-                    "type": "string",
-                    "description": "This is the Phone Number/ IMEI of the GSM"
-                  },
-                  "CO": {
-                    "type": "string",
-                    "description": "The Carbon(iv)oxide value"
-                  },
-                  "DUST": {
-                    "type": "string",
-                    "description": "The dust level"
-                  },
-                  "ETHYL": {
-                    "type": "string",
-                    "description": "The ETHYL level"
-                  },
-                  "NO2": {
-                    "type": "string",
-                    "description": "The NO2 value"
-                  },
-                  "VOC": {
-                    "type": "string",
-                    "description": "The VOC value"
-                  }
-                }
+                "$ref": "#/components/schemas/NewCard"
               }
             }
           }
         },
         "responses": {
-          "200": {
+          "201": {
             "description": "Successful response",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "Id": {
-                          "type": "Integer",
-                          "description": "This is the database Id of the GSM"
-                        },
-                        "DeviceCode": {
-                          "type": "string",
-                          "description": "This is the Phone Number/ IMEI of the GSM"
-                        },
-                        "CO": {
-                          "type": "string",
-                          "description": "The Carbon(iv)oxide value"
-                        },
-                        "DUST": {
-                          "type": "string",
-                          "description": "The dust level"
-                        },
-                        "ETHYL": {
-                          "type": "string",
-                          "description": "The ETHYL level"
-                        },
-                        "NO2": {
-                          "type": "string",
-                          "description": "The NO2 value"
-                        },
-                        "VOC": {
-                          "type": "string",
-                          "description": "The VOC value"
-                        },
-                        "Created_at": {
-                          "type": "Date",
-                          "description": "This is the registration date of the GSM"
-                        }
-                      }
-                    },
-                    "message": {
-                      "type": "string"
-                    }
-                  }
+                  "$ref": "#/components/schemas/Card"
                 }
               }
             }
@@ -218,15 +154,15 @@
         }
       }
     },
-    "/api/gsm/update/{id}": {
+    "/api/clocking/update/{Card_UUID}": {
       "put": {
-        "summary": "Update a new device",
-        "description": "Endpoint to update a new device",
+        "summary": "Update details of a registered card",
+        "description": "Endpoint to update details of a registered card identified by its unique Card_UUID.",
         "parameters": [
           {
-            "name": "id",
+            "name": "Card_UUID",
             "in": "path",
-            "description": "The unique identifier of the registered device to update.",
+            "description": "The unique identifier of the registered card to update.",
             "required": true,
             "schema": {
               "type": "string"
@@ -238,38 +174,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "Id": {
-                    "type": "integer",
-                    "format": "int32",
-                    "description": "This is the particular device you would like to update"
-                  },
-                  "DeviceCode": {
-                    "type": "string",
-                    "description": "This is the Phone Number/ IMEI of the GSM"
-                  },
-                  "CO": {
-                    "type": "string",
-                    "description": "The Carbon(iv)oxide value"
-                  },
-                  "DUST": {
-                    "type": "string",
-                    "description": "The dust level"
-                  },
-                  "ETHYL": {
-                    "type": "string",
-                    "description": "The ETHYL level"
-                  },
-                  "NO2": {
-                    "type": "string",
-                    "description": "The NO2 value"
-                  },
-                  "VOC": {
-                    "type": "string",
-                    "description": "The VOC value"
-                  }
-                }
+                "$ref": "#/components/schemas/Card"
               }
             }
           }
@@ -280,52 +185,82 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "Id": {
-                          "type": "Integer",
-                          "description": "This is the database Id of the GSM"
-                        },
-                        "DeviceCode": {
-                          "type": "string",
-                          "description": "This is the Phone Number/ IMEI of the GSM"
-                        },
-                        "CO": {
-                          "type": "string",
-                          "description": "The Carbon(iv)oxide value"
-                        },
-                        "DUST": {
-                          "type": "string",
-                          "description": "The dust level"
-                        },
-                        "ETHYL": {
-                          "type": "string",
-                          "description": "The ETHYL level"
-                        },
-                        "NO2": {
-                          "type": "string",
-                          "description": "The NO2 value"
-                        },
-                        "VOC": {
-                          "type": "string",
-                          "description": "The VOC value"
-                        },
-                        "Created_at": {
-                          "type": "Date",
-                          "description": "This is the registration date of the GSM"
-                        }
-                      }
-                    },
-                    "message": {
-                      "type": "string"
-                    }
-                  }
+                  "$ref": "#/components/schemas/Card"
                 }
               }
             }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Card": {
+        "type": "object",
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "format": "int32",
+            "description": "The unique identifier of the card."
+          },
+          "Card_UUID": {
+            "type": "string",
+            "description": "The UUID of the card."
+          },
+          "First_Name": {
+            "type": "string",
+            "description": "The first name of the card holder."
+          },
+          "Middle_Name": {
+            "type": "string",
+            "description": "The middle name of the card holder."
+          },
+          "Last_Name": {
+            "type": "string",
+            "description": "The last name of the card holder."
+          },
+          "Reg_No": {
+            "type": "string",
+            "description": "The registration number of the card."
+          },
+          "Department": {
+            "type": "string",
+            "description": "The registration number of the card."
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The date and time when the card was created."
+          }
+        }
+      },
+      "NewCard": {
+        "type": "object",
+        "properties": {
+          "Card_UUID": {
+            "type": "string",
+            "description": "The UUID of the card."
+          },
+          "First_Name": {
+            "type": "string",
+            "description": "The first name of the card holder."
+          },
+          "Middle_Name": {
+            "type": "string",
+            "description": "The middle name of the card holder."
+          },
+          "Last_Name": {
+            "type": "string",
+            "description": "The last name of the card holder."
+          },
+          "Reg_No": {
+            "type": "string",
+            "description": "The registration number of the card."
+          },
+          "Department": {
+            "type": "string",
+            "description": "The department of the card."
           }
         }
       }
